@@ -2,5 +2,7 @@ file(GLOB sources
   "*.c"
   "*.cpp")
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-add_library(com ${sources})
+
+option(BUILD_SHARED_LIBS ON)
+set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+add_library(com SHARED ${sources})

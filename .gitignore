@@ -1,0 +1,26 @@
+# Compiled object files
+*.slo
+*.lo
+*.o
+build/*
+
+#gtags
+GPATH
+GRTAGS
+GTAGS
+
+# Compiled Dynamic libraries
+*.so
+client
+server
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+.DS_Store
+# Generate files
+# rpc.h
+# rpc_clnt.c
+# rpc_svc.c
+# rpc_xdr.c

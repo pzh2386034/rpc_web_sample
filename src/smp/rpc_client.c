@@ -4,68 +4,10 @@
  * as a guideline for developing your own functions.
  */
 
-#include "rpc.h"
-#include "rpc_api.h"
+#include "../common/rpc.h"
+#include "../common/rpc_api.h"
+#include "rpc_clnt.h"
 
-void rpcapiprog_1(host) char *host;
-{
-    CLIENT *clnt;
-    /* RPCOutput *result_1; */
-    /* RPCInput all_api_in_one_1_arg; */
-    RPCIDOutput *result_2;
-    RPCIDInput rpc_identify_remote_1_arg;
-    clnt = clnt_create(host, RPCAPIPROG, RPCAPIVERS, "udp");
-    if (clnt == NULL)
-    {
-        clnt_pcreateerror(host);
-        exit(1);
-    }
-    /* result_1 = all_api_in_one_1(&all_api_in_one_1_arg, clnt); */
-    /* if (result_1 == NULL) { */
-    /*   clnt_perror(clnt, "call failed:"); */
-    /* } */
-    result_2 = rpc_identify_remote_1(&rpc_identify_remote_1_arg, clnt);
-    if (result_2 == NULL)
-    {
-        clnt_perror(clnt, "call failed:");
-    }
-    clnt_destroy(clnt);
-}
-
-guint call_remote(gchar *host, guchar *userip, guchar *username, guchar *passwd, int id)
-{
-    CLIENT *clnt;
-    RPCInput input;
-    RPCOutput *output;
-
-    SYSTIME_INP in;
-    SYSTIME_OUT out;
-    memset(&input, 0, sizeof(RPCInput));
-    in.in_time                      = time(NULL) - 1;
-    input.input_para.input_para_val = (u_char *)&in;
-    input.input_para.input_para_len = sizeof(SYSTIME_INP);
-    input.out_para_len              = sizeof(SYSTIME_OUT);
-    input.fun_index                 = GET_SYS_TIME;
-
-    clnt = clnt_create(host, RPCAPIPROG, RPCAPIVERS, "udp");
-    if (0 == clnt)
-    {
-        printf("%s:client create failed.\n", __FUNCTION__);
-        clnt_pcreateerror(host);
-        return FALSE;
-    }
-    output = all_api_in_one_1(&input, clnt);
-    if (output == NULL)
-    {
-        clnt_perror(clnt, "call fail:");
-        return FALSE;
-    }
-    memcpy(&out, output->output_para.output_para_val, output->output_para.output_para_len);
-
-    printf("%s:client ask ok, ret time:%ld.\n", __FUNCTION__, out.out_time / 3600);
-    clnt_destroy(clnt);
-    return TRUE;
-}
 gint main(int argc, char *argv[])
 {
     char *host;

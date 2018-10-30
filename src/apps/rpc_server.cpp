@@ -4,7 +4,7 @@
  * as a guideline for developing your own functions.
  */
 
-#include "rpc.h"
+#include "../common/rpc.h"
 #include "rpc_resource.hpp"
 #include "rpc_resource_manager.hpp"
 #include "unistd.h"
@@ -13,6 +13,10 @@
     if (NULL == a)        \
         return b;
 static guint32 rpc_verify_user_check(const RPCInput *argp, const RPCOutput *output);
+static guint32 rpc_user_identify(const guchar *usermode,
+                                 const int userid,
+                                 const guchar *username,
+                                 const guchar *userip);
 RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
 {
     static RPCOutput output_para;
@@ -27,33 +31,25 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
     if (NULL == argp)
     {
         printf("%s, input para null point\n", __func__);
-        output_para.output_para.output_para_len = sizeof(guchar);
-        output_para.output_para.output_para_val = &err;
-        return &output_para;
+        goto FAILED_RET;
     }
     if ((strnlen((gchar *)argp->username, sizeof(argp->username)) >= sizeof(argp->username)) ||
         (strnlen((gchar *)argp->userIP, sizeof(argp->userIP)) >= sizeof(argp->userIP)))
     {
         printf("%s,  invalid para.\n", __func__);
-        output_para.output_para.output_para_len = sizeof(guchar);
-        output_para.output_para.output_para_val = &err;
-        return &output_para;
+        goto FAILED_RET;
     }
     if (0 != argp->out_para_len)
     {
         if (argp->out_para_len > MAX_SIZE_RPC_MEM)
         {
             printf("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
-            output_para.output_para.output_para_len = sizeof(guchar);
-            output_para.output_para.output_para_val = &err;
-            return &output_para;
+            goto FAILED_RET;
         }
         if (NULL == (pszout = (guchar *)malloc(argp->out_para_len)))
         {
             printf("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
-            output_para.output_para.output_para_len = sizeof(guchar);
-            output_para.output_para.output_para_val = &err;
-            return &output_para;
+            goto FAILED_RET;
         }
         memset(pszout, 0, (guint)argp->out_para_len);
     }
@@ -70,10 +66,7 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
         if ((NULL == output_para.output_para.output_para_val) ||
             (0 == output_para.output_para.output_para_len))
         {
-            output_para.output_para.output_para_len = sizeof(guchar);
-            output_para.output_para.output_para_val = &err;
-            free(pszout);
-            pszout = NULL;
+            goto FAILED_RET;
         }
         return &output_para;
     }
@@ -86,14 +79,7 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
         if (ulret != 0)
         {
             printf("%s, APIfunc failed fundex:%d ret:0x%x.\n", __func__, argp->fun_index, ulret);
-            output_para.output_para.output_para_len = sizeof(guchar);
-            output_para.output_para.output_para_val = &err;
-            if (NULL != pszout)
-            {
-                free(pszout);
-                pszout = NULL;
-            }
-            return &output_para;
+            goto FAILED_RET;
         }
         output_para.output_para.output_para_len = argp->out_para_len;
         output_para.output_para.output_para_val = pszout;
@@ -102,15 +88,17 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
     else
     {
         printf("%s, APIfunc not exit fundex:%d\n", __func__, argp->fun_index);
-        output_para.output_para.output_para_len = sizeof(guchar);
-        output_para.output_para.output_para_val = &err;
-        if (NULL != pszout)
-        {
-            free(pszout);
-            pszout = NULL;
-        }
-        return &output_para;
+        goto FAILED_RET;
     }
+FAILED_RET:
+    output_para.output_para.output_para_len = sizeof(guchar);
+    output_para.output_para.output_para_val = &err;
+    if (NULL != pszout)
+    {
+        free(pszout);
+        pszout = NULL;
+    }
+    return &output_para;
 }
 static guint32 rpc_verify_user_check(const RPCInput *argp, const RPCOutput *output)
 {
@@ -118,8 +106,22 @@ static guint32 rpc_verify_user_check(const RPCInput *argp, const RPCOutput *outp
     guint32 ulret = 0;
     ASSERT_RETV(output, FALSE);
     ASSERT_RETV(argp, FALSE);
+    ulret = rpc_user_identify(argp->usermode, argp->userid, argp->username, argp->userIP);
+    if (VOS_OK != ulret)
+    {
+        printf("%s, all_api_in_one_1_svc::rpc identify failed.", __FUNCTION__);
+        return VOS_ERR;
+    }
 
     return ulret;
+}
+
+static guint32 rpc_user_identify(const guchar *usermode,
+                                 const int userid,
+                                 const guchar *username,
+                                 const guchar *userip)
+{
+    return 0;
 }
 
 RPCIDOutput *rpc_identify_remote_1_svc(RPCIDInput *argp, struct svc_req *rqstp)

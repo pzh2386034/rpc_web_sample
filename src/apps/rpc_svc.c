@@ -4,6 +4,7 @@
  */
 
 #include "rpc_svc.h"
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <memory.h>
 #include <netdb.h>
@@ -192,104 +193,161 @@ SVCXPRT *transp;
     _rpcsvcdirty = 0;
     return;
 }
+int CreateRPCTCPSock(void)
+{
+    struct sockaddr_in localAddr;
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
+    {
+        return sockfd;
+    }
+    memset_s(&localAddr, sizeof(struct sockaddr_in), 0, sizeof(struct sockaddr_in));
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_port   = 0;
+    if (1 != inet_pton(AF_INET, "127.0.0.1", &(localAddr.sin_addr.s_addr)))
+    {
+        close(sockfd);
+        return -1;
+    }
+    if (bind(sockfd, (struct sockaddr *)&localAddr, sizeof(localAddr)) < 0)
+    {
+        close(sockfd);
+        return -1;
+    }
+    return sockfd;
+}
+
+int CreateRPCUDPSock(void)
+{
+    struct sockaddr_in localAddr;
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0)
+    {
+        return sockfd;
+    }
+    memset_s(&localAddr, sizeof(struct sockaddr_in), 0, sizeof(struct sockaddr_in));
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_port   = 0;
+    if (1 != inet_pton(AF_INET, "127.0.0.1", &(localAddr.sin_addr.s_addr)))
+    {
+        close(sockfd);
+        return -1;
+    }
+    if (bind(sockfd, (struct sockaddr *)&localAddr, sizeof(localAddr)) < 0)
+    {
+        close(sockfd);
+        return -1;
+    }
+    return sockfd;
+}
 
 gpointer rpc_server_main(gpointer argv)
 {
-    SVCXPRT *transp = NULL;
-    argv            = NULL;
-    int sock;
-    int proto = 0;
-    struct sockaddr_in saddr;
-    int asize = sizeof(saddr);
-
-    if (getsockname(0, (struct sockaddr *)&saddr, (socklen_t *)&asize) == 0)
+    SVCXPRT *transptcp, *transpudp = NULL;
+    argv             = NULL;
+    int sockLocalTCP = 0, sockLocalUDP = 0;
+    int proto    = 0;
+    sockLocalTCP = CreateRPCTCPSock();
+    if (sockLocalTCP < 0)
     {
-        int ssize = sizeof(int);
-
-        if (saddr.sin_family != AF_INET)
-            exit(1);
-        if (getsockopt(0, SOL_SOCKET, SO_TYPE, (char *)&_rpcfdtype, (socklen_t *)&ssize) == -1)
-            exit(1);
-        sock        = 0;
-        _rpcpmstart = 1;
-        proto       = 0;
-        openlog("rpc", LOG_PID, LOG_DAEMON);
+        printf("%s, create tcp listen sock failed, ret:%d", __func__, sockLocalTCP);
     }
-    else
+    sockLocalUDP = CreateRPCUDPSock();
+    if (sockLocalUDP < 0)
     {
-#ifndef RPC_SVC_FG
-        int size;
-        int pid, i;
-
-        pid = fork();
-        if (pid < 0)
-        {
-            perror("cannot fork");
-            exit(1);
-        }
-        if (pid)
-            exit(0); /* close father terminal date:<2018-10-06>*/
-        /* 获取当前进程文件描述表的项数，循环关闭 date:<2018-10-06>*/
-        size = getdtablesize();
-        for (i = 0; i < size; i++)
-            (void)close(i);
-        i = open("/dev/console", 2); /* open serial console date:<2018-10-06>*/
-        (void)dup2(i, 1);            /* redirect stdout to serial console date:<2018-10-06>*/
-        (void)dup2(i, 2);            /* redirect stderr to serial console date:<2018-10-06>*/
-        i = open("/dev/tty", 2);
-        if (i >= 0)
-        {
-            (void)ioctl(i, TIOCNOTTY, (char *)NULL);
-            (void)close(i);
-        }
-        openlog("rpc", LOG_PID, LOG_DAEMON);
-#endif
-        sock = RPC_ANYSOCK;
-        (void)pmap_unset(RPCAPIPROG, RPCAPIVERS);
+        printf("%s, create udp listen sock failed, ret:%d", __func__, sockLocalUDP);
     }
 
-    if ((_rpcfdtype == 0) || (_rpcfdtype == SOCK_DGRAM))
-    {
-        transp = svcudp_create(sock);
-        if (transp == NULL)
-        {
-            _msgout("cannot create udp service.");
-            exit(1);
-        }
-        if (!_rpcpmstart)
-            proto = IPPROTO_UDP;
-        if (!svc_register(transp, RPCAPIPROG, RPCAPIVERS, rpcapiprog_1, proto))
-        {
-            _msgout("unable to register (RPCAPIPROG, RPCAPIVERS, udp).");
-            exit(1);
-        }
-    }
+    /* 获得一个套接字的ip地址 date:<2018-11-01>*/
+    /*     if (getsockname(0, (struct sockaddr *)&saddr, (socklen_t *)&asize) == 0) */
+    /*     { */
+    /*         int ssize = sizeof(int); */
 
-    if ((_rpcfdtype == 0) || (_rpcfdtype == SOCK_STREAM))
-    {
-        if (_rpcpmstart)
-            transp = svcfd_create(sock, 0, 0);
-        else
-            transp = svctcp_create(sock, 0, 0);
-        if (transp == NULL)
-        {
-            _msgout("cannot create tcp service.");
-            exit(1);
-        }
-        if (!_rpcpmstart)
-            proto = IPPROTO_TCP;
-        if (!svc_register(transp, RPCAPIPROG, RPCAPIVERS, rpcapiprog_1, proto))
-        {
-            _msgout("unable to register (RPCAPIPROG, RPCAPIVERS, tcp).");
-            exit(1);
-        }
-    }
+    /*         if (saddr.sin_family != AF_INET) /\* ipv4地址族 date:<2018-11-01>*\/ */
+    /*             exit(1); */
+    /*         /\* 获取任意类型，任意状态套接字的选项的当前值，并把结果存入para4 date:<2018-11-01>
+     */
+    /* @para1 套接字描述符 */
+    /* @para2 选择定义层级 */
+    /* @para3 需获取的套接字选项 */
+    /* @para4 optval获得选项值的缓冲区 */
+    /* @para5 optval长度 */
+    /*          *\/ */
+    /*         if (getsockopt(0, SOL_SOCKET, SO_TYPE, (char *)&_rpcfdtype, (socklen_t *)&ssize) ==
+     * -1) */
+    /*             exit(1); */
+    /*         sock        = 0; */
+    /*         _rpcpmstart = 1; */
+    /*         proto       = 0; */
+    /*         openlog("rpc", LOG_PID, LOG_DAEMON); */
+    /*     } */
+    /*     else */
+    /*     { */
+    /* #ifndef RPC_SVC_FG */
+    /*         int size; */
+    /*         int pid, i; */
 
-    if (transp == (SVCXPRT *)NULL)
+    /*         pid = fork(); */
+    /*         if (pid < 0) */
+    /*         { */
+    /*             perror("cannot fork"); */
+    /*             exit(1); */
+    /*         } */
+    /*         if (pid) */
+    /*             exit(0); /\* close father terminal date:<2018-10-06>*\/ */
+    /*         /\* 获取当前进程文件描述表的项数，循环关闭 date:<2018-10-06>*\/ */
+    /*         size = getdtablesize(); */
+    /*         for (i = 0; i < size; i++) */
+    /*             (void)close(i); */
+    /*         i = open("/dev/console", 2); /\* open serial console date:<2018-10-06>*\/ */
+    /*         (void)dup2(i, 1);            /\* redirect stdout to serial console
+     * date:<2018-10-06>*\/ */
+    /*         (void)dup2(i, 2);            /\* redirect stderr to serial console
+     * date:<2018-10-06>*\/ */
+    /*         i = open("/dev/tty", 2); */
+    /*         if (i >= 0) */
+    /*         { */
+    /*             (void)ioctl(i, TIOCNOTTY, (char *)NULL); */
+    /*             (void)close(i); */
+    /*         } */
+    /*         openlog("rpc", LOG_PID, LOG_DAEMON); */
+    /* #endif */
+    /*         sock = RPC_ANYSOCK; */
+    /*         (void)pmap_unset(RPCAPIPROG, RPCAPIVERS); */
+    /*     } */
+
+    transpudp = svcudp_create(sockLocalUDP);
+    if (transpudp == NULL)
     {
-        _msgout("could not create a handle");
+        _msgout("cannot create udp service.");
         exit(1);
     }
+    if (!_rpcpmstart)
+        proto = IPPROTO_UDP;
+    if (!svc_register(transpudp, RPCAPIPROG, RPCAPIVERS, rpcapiprog_1, proto))
+    {
+        _msgout("unable to register (RPCAPIPROG, RPCAPIVERS, udp).");
+        svc_destroy(transpudp);
+        close(sockLocalUDP);
+        exit(1);
+    }
+
+    transptcp = svctcp_create(sockLocalTCP, 0, 0);
+    if (transptcp == NULL)
+    {
+        _msgout("cannot create tcp service.");
+        exit(1);
+    }
+    if (!_rpcpmstart)
+        proto = IPPROTO_TCP;
+    if (!svc_register(transptcp, RPCAPIPROG, RPCAPIVERS, rpcapiprog_1, proto))
+    {
+        _msgout("unable to register (RPCAPIPROG, RPCAPIVERS, tcp).");
+        svc_destroy(transptcp);
+        close(sockLocalTCP);
+        exit(1);
+    }
+
     if (_rpcpmstart)
     {
         (void)signal(SIGALRM, (void (*)())closedown);
@@ -297,7 +355,12 @@ gpointer rpc_server_main(gpointer argv)
     }
     thread_monitor_register(&g_rpc_hb_handle, UNABLE, 60 * 0.5, rpc_thread_handle, "rpcServ");
     svc_run();
+    close(sockLocalUDP);
+    close(sockLocalTCP);
+    svc_destroy(transpudp);
+    svc_destroy(transptcp);
     _msgout("svc_run returned");
+
     exit(1);
     /* NOTREACHED */
 }

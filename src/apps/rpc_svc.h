@@ -1,6 +1,6 @@
 #ifndef __RPC_SVC__
 #define __RPC_SVC__
-#include "rpc.h"
+#include "../common/rpc.h"
 #ifdef __cplusplus
 #if __cplusplus
 extern "C"

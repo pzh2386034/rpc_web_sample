@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("webInter", "for webInter support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("webInter", "enable webInter support", "no");
+
+if (PHP_WEBINTER != "no") {
+	EXTENSION("webInter", "webInter.c");
+}
+

@@ -4,7 +4,9 @@
  */
 
 #include "rpc_clnt.h"
-#include "rpc_api.h"
+#include "../common/rpc_api.h"
+#include "stdio.h"
+#include "unistd.h"
 
 /* Default timeout can be changed using clnt_control() */
 
@@ -68,6 +70,11 @@ guint call_remote(gchar *host, guchar *userip, guchar *username, guchar *passwd,
     CLIENT *clnt;
     RPCInput input;
     RPCOutput *output;
+
+    /* 获取用户信息 date:<2018-11-02>*/
+    char userid[3] = {0};
+    getlogin_r(userid, 3);
+    printf("userid = %s\n", userid);
 
     SYSTIME_INP in;
     SYSTIME_OUT out;

@@ -27,6 +27,7 @@ include_directories(src/common)
 add_subdirectory(src/common)
 add_subdirectory(src/apps)
 add_subdirectory(src/smp)
+add_subdirectory(src/webinterface)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)

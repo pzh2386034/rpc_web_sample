@@ -1,23 +1,30 @@
 <?php
 
-session_start();
+// session_start();
 class User_Authentication extends CI_Controller
 {
     public function __construct(){
         parent::__construct();
 
         //load form helper library
-        $this->load->help('form');
+        $this->load->helper('form');
         //load form validation library
         $this->load->library('form_validation');
+        $this->load->helper('security');
+
 
         //load session library
         $this->load->library('session');
         //load database
         $this->load->model('login_database');
+        $this->load->helper('url');
     }
     //show login pages
+    //index method will be called when the second paragraph is empty.
     public function index(){
+        // if ($this->session->userdata('is_authenticated') == FALSE){
+        //     redirect("users/login");
+        // }
         $this->load->view('registration_form');
     }
 

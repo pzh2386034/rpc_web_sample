@@ -35,7 +35,8 @@ $config['base_url'] = 'http://localhost/webUI/';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
+$config['selfcss_dir'] = 'http://localhost/webUI/application/css/';
 
 /*
 |--------------------------------------------------------------------------

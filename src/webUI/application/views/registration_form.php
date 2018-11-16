@@ -1,7 +1,7 @@
 <html>
     <?php
     if (isset($this->session->userdata['logged_in'])) {
-        header("location: http://localhost/login/index.php/user_authentication/user_login_process");
+        header("location: http://localhost/webUI/user_authentication/user_login_process");
     }
     ?>
     <head>
@@ -46,8 +46,15 @@
                 echo form_submit('submit', 'Sign Up');
                 echo form_close();
                 ?>
-                <a href="<?php echo base_url() ?> ">For Login Click Here</a>
+                <a href="javascript:void(0)" align="left" onclick="loginclick()">Login</a>
             </div>
         </div>
     </body>
+    <script type="text/javascript">
+     function loginclick()
+     {
+         window.location.href="<?php echo base_url() ?>"+"user_authentication/user_login_process";
+      }
+
+    </script>
 </html>

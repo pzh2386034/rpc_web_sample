@@ -322,6 +322,23 @@ class CI_Config {
 		return $base_url.$this->_uri_string($uri);
 	}
 
+	/**
+	 * self CSS DIRECTORY
+	 *
+	 * Returns selfcss_dir [. uri_string]
+	 *
+	 * @uses	CI_Config::_uri_string()
+	 *
+	 * @param	string|string[]	$uri	URI string or an array of segments
+	 * @return	string
+	 */
+	public function css_url($uri = '')
+	{
+		$base_url = $this->slash_item('selfcss_dir');
+
+
+		return $base_url.$this->_uri_string($uri);
+	}
 	// -------------------------------------------------------------
 
 	/**

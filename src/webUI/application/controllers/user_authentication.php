@@ -22,9 +22,11 @@ class User_Authentication extends CI_Controller
     //show login pages
     //index method will be called when the second paragraph is empty.
     public function index(){
-        // if ($this->session->userdata('is_authenticated') == FALSE){
-        //     redirect("users/login");
-        // }
+        if (isset($this->session->userdata['logged_in']))
+        {
+            // redirect('view/admin_page', $method = 'auto', $code = NULL);
+            $this->load->view('admin_page');
+        }
         $this->load->view('registration_form');
     }
 
@@ -83,42 +85,12 @@ class User_Authentication extends CI_Controller
                     // Add user data in session
                     $this->session->set_userdata('logged_in', $session_data);
                     $this->load->view('admin_page');
-}
-        $this->form_validation->set_rules('username', 'Username', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
-
-        if ($this->form_validation->run() == FALSE) {
-            if(isset($this->session->userdata['logged_in'])){
-                $this->load->view('admin_page');
+                }
             }else{
-                $this->load->view('login_form');
-            }
-        } else {
-            $data = array(
-                'username' => $this->input->post('username'),
-                'password' => $this->input->post('password')
-            );
-            $result = $this->login_database->login($data);
-            if ($result == TRUE) {
-
-                $username = $this->input->post('username');
-                $result = $this->login_database->read_user_information($username);
-                if ($result != false) {
-                    $session_data = array(
-                        'username' => $result[0]->user_name,
-                        'email' => $result[0]->user_email,
-                    );
-                    // Add user data in session
-                    $this->session->set_userdata('logged_in', $session_data);
-                    $this->load->view('admin_page');
-                }
-                else
-                {
-                    $data = array('error_message'=>'Invalid Username or Password');
-                    $this->load->view('login_form', $data);
-                }
-            }
-        }
+                $data = array(
+                    'error_message' =>'Invalid Username or Password',
+                );
+                $this->load-view("login_form", $data, $return = FALSE);
             }
         }
     }

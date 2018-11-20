@@ -27,7 +27,8 @@ class User_Authentication extends CI_Controller
             // redirect('view/admin_page', $method = 'auto', $code = NULL);
             $this->load->view('admin_page');
         }
-        $this->load->view('registration_form');
+        // $this->load->view('registration_form');
+        $this->load->view('admin_login_form');
     }
 
     // Validate and store registration data in database
@@ -35,7 +36,7 @@ class User_Authentication extends CI_Controller
 
         // Check validation for user input in SignUp form
         $this->form_validation->set_rules('username', 'Username', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('email_value', 'Email', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('email_value', 'Email', 'trim|required|valid_email|xss_clean');
         $this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
         if ($this->form_validation->run() == FALSE) {
             $this->load->view('registration_form');
@@ -65,7 +66,7 @@ class User_Authentication extends CI_Controller
             if(isset($this->session->userdata['logged_in'])){
                 $this->load->view('admin_page');
             }else{
-                $this->load->view('login_form');
+                $this->load->view('admin_login_form');
             }
         } else {
             $data = array(
@@ -90,7 +91,7 @@ class User_Authentication extends CI_Controller
                 $data = array(
                     'error_message' =>'Invalid Username or Password',
                 );
-                $this->load-view("login_form", $data, $return = FALSE);
+                $this->load->view('admin_login_form', $data, $return = FALSE);
             }
         }
     }
@@ -100,7 +101,7 @@ class User_Authentication extends CI_Controller
         $sess_array = array('username'=>'');
         $this->session->unset_userdata('logged_in', $sess_array);
         $data['message_display']='Successfully Logout';
-        $this->load->view('login_form', $data);
+        $this->load->view('admin_login_form', $data);
     }
 }
 ?>

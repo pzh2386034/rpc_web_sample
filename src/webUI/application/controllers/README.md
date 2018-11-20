@@ -17,3 +17,5 @@ $route['default_controller'] = 'blog';
 * 私有方法无法通过uri的方式访问
 * 
 * 重载构造函数则必须手动调用父类构造函数
+
+* 要自己构建表单字段验证函数username_check,在需要使用处callback\_username\_check

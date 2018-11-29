@@ -14,19 +14,11 @@
     </head>
     <body>
         <div id="profile">
-            <?php
-            echo "Hello <b id='welcome'><i>" . $username . "</i> !</b>";
-            echo "<br/>";
-            echo "<br/>";
-            echo "Welcome to Admin Page";
-            echo "<br/>";
-            echo "<br/>";
-            echo "Your Username is " . $username;
-            echo "<br/>";
-            echo "Your Email is " . $email;
-            echo "<br/>";
-            ?>
-            <b id="logout"><a href="logout">Logout</a></b>
+            <h2>Hello <b><i><?php echo $username ?></i></b> !</h2>
+            <h5>Welcome to Admin Page</h5>
+            <h5>Your Username is <?php echo $username ?> </h5>
+            <h5>Your Email is <?php echo $email ?> </h5>
+            <b><a href="logout">Logout</a></b>
         </div>
         <br/>
     </body>

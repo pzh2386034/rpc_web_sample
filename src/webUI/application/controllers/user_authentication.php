@@ -28,7 +28,8 @@ class User_Authentication extends CI_Controller
             $this->load->view('admin_page');
         }
         // $this->load->view('registration_form');
-        $this->load->view('admin_login_form');
+        // $this->load->view('admin_login_form');
+        $this->load->view("index.html", $vars = array(), $return = FALSE);
     }
 
     // Validate and store registration data in database
@@ -73,25 +74,46 @@ class User_Authentication extends CI_Controller
                 'username' => $this->input->post('username'),
                 'password' => $this->input->post('password')
             );
-            $result = $this->login_database->login($data);
-            if ($result == TRUE) {
+            if ($this->input->post('LoginMethod', $xss_clean = NULL) == "user")
+            {
+                $result = $this->login_database->login($data);
+                if ($result == TRUE) {
 
-                $username = $this->input->post('username');
-                $result = $this->login_database->read_user_information($username);
-                if ($result != false) {
-                    $session_data = array(
-                        'username' => $result[0]->user_name,
-                        'email' => $result[0]->user_email,
+                    $username = $this->input->post('username');
+                    $result = $this->login_database->read_user_information($username);
+                    if ($result != false) {
+                        $session_data = array(
+                            'username' => $result[0]->user_name,
+                            'email' => $result[0]->user_email,
+                        );
+                        // Add user data in session
+                        $this->session->set_userdata('logged_in', $session_data);
+                        $this->load->view('admin_page');
+                    }
+                }else{
+                    $data = array(
+                        'error_message' =>'Invalid Username or Password',
                     );
-                    // Add user data in session
-                    $this->session->set_userdata('logged_in', $session_data);
-                    $this->load->view('admin_page');
+                    $this->load->view('admin_login_form', $data, $return = FALSE);
                 }
-            }else{
-                $data = array(
-                    'error_message' =>'Invalid Username or Password',
-                );
-                $this->load->view('admin_login_form', $data, $return = FALSE);
+            }
+            else
+            {
+                $retcode=cgi_admin_user_login($username, $password);
+                var_dump($retcode);
+                if ($retcode == 0)
+                {
+                    $session_data = array(
+                        'username' => $username,
+                    );
+                    $this->session->set_userdata('logged_in', $session_data);
+                    $this->load->view('admin_page', $vars = array(), $return = FALSE);
+                }
+                else
+                {
+                    var_dump('Login as admin failed');
+                    exit();
+                }
             }
         }
     }

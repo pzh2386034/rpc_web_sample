@@ -82,6 +82,23 @@ PHP_FUNCTION(hello_add)
     result = add(num_a, num_b);
     RETURN_LONG(result);
 }
+PHP_FUNCTION(cgi_admin_user_login)
+{
+    char *username = NULL;
+    char *passwd   = NULL;
+    int username_len, passwd_len;
+    char user[50] = {0}, pwd[20] = {0};
+    long int result = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &username, &username_len, &passwd,
+                              &passwd_len) == FAILURE)
+    {
+        return;
+    }
+    memcpy(user, username, username_len);
+    memcpy(pwd, passwd, passwd_len);
+    result = admin_user_login(user, pwd);
+    RETURN_LONG(result);
+}
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and
    unfold functions in source code. See the corresponding marks just before
@@ -161,7 +178,9 @@ PHP_MINFO_FUNCTION(webInter)
  */
 const zend_function_entry webInter_functions[] = {
     PHP_FE(confirm_webInter_compiled, NULL) /* For testing, remove later. */
-    PHP_FE(hello_add, NULL) PHP_FE_END      /* Must be the last line in webInter_functions[] */
+    PHP_FE(hello_add, NULL)                 /* cgi test function date:<2018-11-21>*/
+    PHP_FE(cgi_admin_user_login, NULL)      /* cgi admin login function date:<2018-11-21>*/
+    PHP_FE_END                              /* Must be the last line in webInter_functions[] */
 };
 /* }}} */
 

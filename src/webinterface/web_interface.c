@@ -11,3 +11,7 @@ int login_http(char *username, char *passwd)
     printf("%s, username:%s, passwd:%s", __func__, username, passwd);
     return 0;
 }
+int admin_user_login(char *username, char *passwd)
+{
+    char *RPC_INPUT;
+}

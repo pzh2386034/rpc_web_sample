@@ -1,17 +1,5 @@
 #include "rpc_resource.hpp"
-#include "rpc_api.h"
-#ifndef MEM_FREE
-#define MEM_FREE(p)   \
-    do                \
-    {                 \
-        if (p)        \
-        {             \
-            delete p; \
-            p = NULL; \
-        }             \
-    } while (0);
-;
-#endif
+#include "../common/rpc_api.h"
 
 enum op_log
 {
@@ -178,8 +166,34 @@ guint32 RPC_GET_SYS_TIME::RpcresUserDomainAuthority(PARALIST_RPC_AUTHORITY)
            usermode, (int)inputlen, (int)outputlen, func_id);
     return TRUE;
 }
+
+/**************************************
+ * date:<2018-11-22>
+add rpc resource
+admin login
+ * author:  pzh2467908@163.com
+ **************************************/
+DECLEAR_NEW_RPC_RES_ITEM(RPC_ADMIN_USER_LOGIN,
+                         ADMIN_USER_LOGIN,
+                         "admin login authentication",
+                         RPC_USER_COMMON,
+                         RPC_RES_NEED_OPLOG);
+rpc_call_smm RPC_ADMIN_USER_LOGIN::GetRpcFunCall(void)
+{
+    return rpccall_api_admin_login;
+}
+void RPC_ADMIN_USER_LOGIN::RpcTransLog(PARALIST_LOG_FUNC)
+{
+    return;
+}
+guint32 RPC_ADMIN_USER_LOGIN::RpcresUserDomainAuthority(PARALIST_RPC_AUTHORITY)
+{
+    return 0;
+}
 void rpc_resource_init()
 {
     static RPC_GET_SYS_TIME rpc_get_sys_time_ins;
     RpcResource::AddItem(rpc_get_sys_time_ins);
+    static RPC_ADMIN_USER_LOGIN rpc_admin_user_login;
+    RpcResource::AddItem(rpc_admin_user_login);
 }

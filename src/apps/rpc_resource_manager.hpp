@@ -16,14 +16,14 @@ extern "C"
 
 #define RPC_RES_ERR_OK 0
 #define RPC_RES_ERR_GENERIC -1
-#define RPC_RES_ERR_INDEX_NOT_EXIST -2
+#define RPC_RES_ERR_INDEX_NOT_EXIST2 -2
 #define RPC_PRIVILLEGE_ERROR 0xFF
 
     gint32 RpcresTransLogProcess(PARALIST_RPC_CALL);
 
     guint32 RpcresUserDomainAuthority(PARALIST_RPC_AUTHORITY);
 
-    gint32 RpcresCopyDescryption(guint func_id, char *outDescryption, size_t outBuflen);
+    guint32 RpcresCopyDescryption(guint func_id, char *outDescryption, size_t outBuflen);
 
     const gchar *RpcresGetDescryption(guint func_id);
 
@@ -31,7 +31,7 @@ extern "C"
 
     guint8 RpcresGetPrivilege(guint func_id);
 
-    gint32 RpcresNeedRecordLog(guint func_id);
+    guint32 RpcresNeedRecordLog(guint func_id);
 
     void RpcresInit(void);
 

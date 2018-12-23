@@ -1,0 +1,14 @@
+#ifndef _ERRORCODE_H_
+#define _ERRORCODE_H_
+#define VOS_OK 0
+#define OK 0
+#define VOS_ERR 1
+#define ERR 1
+#define ERROR 1
+#define INPUT_NULL 0x10000001
+#define INPUT_PARA_ERR 0x10000002
+#define RPC_NO_CONNECTION 0X1000003
+#define RPC_APP_FAILED 0x1000004
+#define RPC_CREATE_FAILED 1
+#define RPC_CREATE_SUCCEED 0
+#endif

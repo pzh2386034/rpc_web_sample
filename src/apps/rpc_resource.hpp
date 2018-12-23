@@ -1,21 +1,11 @@
 #ifndef __RPC_RESOURCE_HPP__
 #define __RPC_RESOURCE_HPP__
 #include <iostream>
+#include "../common/rpc_api.h"
 #include "glib-2.0/glib.h"
 #include "map"
 #include "string.h"
 using namespace std;
-#define PARALIST_LOG_FUNC                                                                        \
-    const guchar *user_name, const guchar *user_ip, const guchar *usermode, const guchar *input, \
-        size_t inputlen, const guchar *output, size_t outputlen, guint32 func_id
-
-#define PARALIST_RPC_CALL                                                               \
-    guchar *username, guchar *userip, guchar *usermode, guchar *input, size_t inputLen, \
-        guchar *output, size_t outputlen
-
-#define PARALIST_RPC_AUTHORITY                                                                   \
-    const guchar *user_name, const guchar *user_ip, const guchar *usermode, const guchar *input, \
-        size_t inputlen, const guchar *output, size_t outputlen, guint32 func_id
 
 /* define fun point for write with different rpc index. date:<2018-10-04>*/
 typedef void (*rpc_trans_log)(PARALIST_LOG_FUNC);

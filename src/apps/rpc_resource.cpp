@@ -156,13 +156,13 @@ rpc_call_smm RPC_GET_SYS_TIME::GetRpcFunCall(void)
 }
 void RPC_GET_SYS_TIME::RpcTransLog(PARALIST_LOG_FUNC)
 {
-    printf("%s, i am in translog, %s, %s, %s, %d, %d, %ud", __func__, user_name, user_ip, usermode,
+    printf("%s, i am in translog, %s, %s, %d, %d, %d, %ud", __func__, user_name, user_ip, usermode,
            (int)inputlen, (int)outputlen, func_id);
     return;
 }
 guint32 RPC_GET_SYS_TIME::RpcresUserDomainAuthority(PARALIST_RPC_AUTHORITY)
 {
-    printf("%s, i am in UserDomainAuthority, %s, %s, %s, %d, %d, %ud", __func__, user_name, user_ip,
+    printf("%s, i am in UserDomainAuthority, %s, %s, %d, %d, %d, %ud", __func__, user_name, user_ip,
            usermode, (int)inputlen, (int)outputlen, func_id);
     return TRUE;
 }

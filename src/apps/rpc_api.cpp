@@ -1,4 +1,5 @@
 #include "../common/rpc_api.h"
+#include "../common/commonFun.h"
 #include "func_handle.h"
 #include "rpc_resource.hpp"
 #include "security/pam_appl.h"

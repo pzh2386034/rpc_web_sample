@@ -14,10 +14,13 @@
             <div id="login">
                 <h2>Registration Form</h2>
                 <hr/>
-                    <div class="error_msg">
-                        <?php echo validation_errors(); ?>
-                    </div>
-                    <?php  echo form_open('user_authentication/new_user_registration');?>
+                <div class="error_msg">
+                    <?php echo validation_errors(); ?>
+                </div>
+                <?php
+                    $fattr = array('class' => 'form-signin');
+
+                    echo form_open('user_authentication/new_user_registration', $fattr);?>
                     <br/>
                     <label>Create Username :</label>
                     <input type="text" name="username" value="<?php echo set_value('username'); ?>" size="50">
@@ -35,6 +38,7 @@
                     <br/>
                     <label>Password :</label>
                     <input type="password" name="password">
+                    <br/>
                     <br/>
                     <div>
                         <input type="submit" value="Submit"/>

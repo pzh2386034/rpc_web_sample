@@ -29,7 +29,7 @@ class User_Authentication extends CI_Controller
         }
         // $this->load->view('registration_form');
         // $this->load->view('admin_login_form');
-        $this->load->view("index.html", $vars = array(), $return = FALSE);
+        $this->load->view("admin_login_form.php", $vars = array(), $return = FALSE);
     }
 
     // Validate and store registration data in database

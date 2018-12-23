@@ -4,23 +4,71 @@
  * as a guideline for developing your own functions.
  */
 
-#include "../common/rpc.h"
+#include "../common/commonFun.h"
+#include "../common/errorcode.h"
 #include "../common/rpc_api.h"
+#include "rpc_call_fun.h"
 #include "rpc_clnt.h"
 
+void rpc_cli_get_info(guchar *username,
+                      guint username_len,
+                      guchar *userip,
+                      guint ip_len,
+                      guint *userid,
+                      guint *usermode)
+{
+    timelog("[%s] call rpc_webui_get_info.\n", __func__);
+    return;
+}
+int admin_user_login_cli(char *username, const char *passwd, const char *userip)
+{
+    ADMIN_USER_LOGIN_INP input;
+    ADMIN_USER_LOGIN_OUT output;
+    guint ulret = 0;
+    if (NULL == username || NULL == passwd || NULL == userip)
+    {
+        timelog("%s: null point.\n", __func__);
+        return INPUT_NULL;
+    }
+    if (strlen(username) + 1 >= MAX_LEN_USERNAME || strlen(passwd) + 1 >= MAX_LEN_PASSWD ||
+        strlen(userip) + 1 >= MAX_LEN_PASSWD)
+    {
+        timelog("%s: parameters is too long.\n", __func__);
+        return INPUT_PARA_ERR;
+    }
+    memset_s(&input, sizeof(ADMIN_USER_LOGIN_INP), 0, sizeof(ADMIN_USER_LOGIN_INP));
+    memset_s(&output, sizeof(ADMIN_USER_LOGIN_OUT), 0, sizeof(ADMIN_USER_LOGIN_OUT));
+    strcpy(input.username, username);
+    strncpy(input.userIP, userip, sizeof(input.userIP) - 1);
+    strncpy(input.passwd, passwd, sizeof(input.passwd) - 1);
+    input.authtype = CLI_AUTH;
+    input.login    = 1;
+    ulret = rpc_call_interface(ADMIN_USER_LOGIN, (guchar *)&input, sizeof(input), (guchar *)&output,
+                               sizeof(output));
+    memset_s(&output, sizeof(output), 0, sizeof(output));
+
+    return SUCCESS;
+}
+#ifdef BUILD_BINARY
 gint main(int argc, char *argv[])
 {
     char *host;
     guchar username[MAX_LEN_USERNAME] = "panzehua";
     guchar userip[MAX_LEN_USERIP]     = "172.168.0.1";
     guchar passwd[MAX_LEN_PASSWD]     = "123";
-
+    /*注册rpc info句柄  date:<2018-12-12>*/
+    /* gFUNC       = (RPC_INFO_HOOK *)malloc(sizeof(RPC_INFO_HOOK)); */
+    /* gFUNC->Func = rpc_cli_get_info; */
+    init_rpc_get_info(rpc_cli_get_info);
+    /* 初始化rpc调用句柄 date:<2018-12-11>*/
+    rpc_create(0);
     if (argc < 2)
     {
         printf("usage: %s server_host\n", argv[0]);
         exit(1);
     }
-    host = argv[1];
-
-    call_remote(host, userip, username, passwd, 2);
+    host = "127.0.0.1";
+    admin_user_login_cli(username, passwd, userip);
+    /* call_remote(host, userip, username, passwd, 2); */
 }
+#endif

@@ -23,12 +23,12 @@
 #endif
 
 /* #include "../standard/info.h" */
+#include "../../common/commonFun.h"
 #include "../web_interface.h"
 #include "dlfcn.h"
 #include "php.h"
 #include "php_ini.h"
 #include "php_webInter.h"
-
 /* If you declare any globals in php_webInter.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(webInter)
 */
@@ -96,7 +96,11 @@ PHP_FUNCTION(cgi_admin_user_login)
     }
     memcpy(user, username, username_len);
     memcpy(pwd, passwd, passwd_len);
-    result = admin_user_login(user, pwd);
+    result = admin_user_login(user, pwd, "127.0.0.1");
+    if (result != SUCCESS)
+    {
+        printf("[%s] admin_user_login failed.\n", __func__);
+    }
     RETURN_LONG(result);
 }
 /* }}} */
@@ -119,12 +123,26 @@ static void php_webInter_init_globals(zend_webInter_globals *webInter_globals)
 
 /* {{{ PHP_MINIT_FUNCTION
  */
+int (*web_request_fun)(void);
 PHP_MINIT_FUNCTION(webInter)
 {
     /* If you have INI entries, uncomment these lines
     REGISTER_INI_ENTRIES();
     */
-    (void)dlopen("/usr/local/lib/librpc_web.dylib", RTLD_LAZY);
+    void *handle = NULL;
+    char *error;
+    /* timelog("begin to load rpc_web"); */
+    handle = dlopen("/usr/local/lib/librpc_web.dylib", RTLD_LAZY);
+    /* if (NULL == handle) */
+    /* { */
+    /*     timelog("open failed."); */
+    /*     exit(1); */
+    /* } */
+    /* web_request_fun = dlsym(handle, "web_request"); */
+    /* if ((error = dlerror()) != NULL) */
+    /* { */
+    /*     exit(1); */
+    /* } */
     return SUCCESS;
 }
 /* }}} */
@@ -145,6 +163,10 @@ PHP_MSHUTDOWN_FUNCTION(webInter)
  */
 PHP_RINIT_FUNCTION(webInter)
 {
+    /* timelog("[%s] begin to ask web_request", __func__); */
+    web_request();
+    /* timelog("[%s] ask web_request end", __func__); */
+
     return SUCCESS;
 }
 /* }}} */
@@ -154,6 +176,7 @@ PHP_RINIT_FUNCTION(webInter)
  */
 PHP_RSHUTDOWN_FUNCTION(webInter)
 {
+    web_request_end();
     return SUCCESS;
 }
 /* }}} */

@@ -59,7 +59,7 @@ static void log_rpc_info(RPCInput *arg)
         printf("%s, null point.", __func__);
         return;
     }
-    printf("%s:user:%s,ip:%s,mode:%s,fun_index:%d,out_len:%d,in_len:%d,in:%s\n", __func__,
+    printf("%s:user:%s,ip:%s,mode:%d,fun_index:%d,out_len:%d,in_len:%d,in:%s\n", __func__,
            arg->username, arg->userIP, arg->usermode, arg->fun_index, arg->out_para_len,
            arg->input_para.input_para_len, arg->input_para.input_para_val);
 }

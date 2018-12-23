@@ -26,7 +26,7 @@ struct RPCInput
     u_int userid;
     u_char username[MAX_LEN_USERNAME];
     u_char userIP[MAX_LEN_USERIP];
-    u_char usermode[MAX_LEN_USERMODE];
+    u_int usermode;
     u_int fun_index;
     u_int out_para_len;
     struct

@@ -9,6 +9,18 @@ extern "C"
 #endif
 #endif /* __cplusplus */
 
+#define PARALIST_LOG_FUNC                                                                      \
+    const guchar *user_name, const guchar *user_ip, const guint usermode, const guchar *input, \
+        size_t inputlen, const guchar *output, size_t outputlen, guint32 func_id
+
+#define PARALIST_RPC_CALL                                                             \
+    guchar *username, guchar *userip, guint usermode, guchar *input, size_t inputLen, \
+        guchar *output, size_t outputlen
+
+#define PARALIST_RPC_AUTHORITY                                                                 \
+    const guchar *user_name, const guchar *user_ip, const guint usermode, const guchar *input, \
+        size_t inputlen, const guchar *output, size_t outputlen, guint32 func_id
+
 #ifndef MEM_FREE
 #define MEM_FREE(p)   \
     do                \
@@ -26,6 +38,7 @@ extern "C"
 #define RPC_PRIVILEGE_ERROR 0X40000002
 #define RPC_INPUT_PARAMETER_ERR 0X40000003
 #define MAX_IPV6_ADDR_LEN 128
+#define TOKEN_LEN 256
     enum RPC_PRIVILEGE
     {
         RPC_USER_ADMIN  = 0,
@@ -74,21 +87,9 @@ extern "C"
 #define ACCOUNT_LOCK_ERR 0x52000002
     /* end admin login date:<2018-11-22>*/
 
-    guint32 rpccall_api_get_systime(guchar *username,
-                                    guchar *userip,
-                                    guchar *usermode,
-                                    guchar *input,
-                                    size_t inputLen,
-                                    guchar *output,
-                                    size_t outputlen);
+    guint32 rpccall_api_get_systime(PARALIST_RPC_CALL);
 
-    guint32 rpccall_api_admin_login(guchar *username,
-                                    guchar *userip,
-                                    guchar *usermode,
-                                    guchar *input,
-                                    size_t inputLen,
-                                    guchar *output,
-                                    size_t outputlen);
+    guint32 rpccall_api_admin_login(PARALIST_RPC_CALL);
 
 #ifdef __cplusplus
 #if __cplusplus

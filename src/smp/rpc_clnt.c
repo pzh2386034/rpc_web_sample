@@ -4,6 +4,8 @@
  */
 
 #include "rpc_clnt.h"
+#include "../common/commonFun.h"
+#include "../common/errorcode.h"
 #include "../common/rpc_api.h"
 #include "stdio.h"
 #include "unistd.h"
@@ -20,7 +22,7 @@ RPCOutput *all_api_in_one_1(RPCInput *argp, CLIENT *clnt)
                     &clnt_res, TIMEOUT);
     if (ret != RPC_SUCCESS)
     {
-
+        timelog("[%s] clnt_call failed.\n", __func__);
         return (NULL);
     }
     return (&clnt_res);

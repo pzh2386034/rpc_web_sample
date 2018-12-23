@@ -16,8 +16,7 @@ bool_t xdr_RPCInput(XDR *xdrs, RPCInput *objp)
     if (!xdr_vector(xdrs, (char *)objp->userIP, MAX_LEN_USERIP, sizeof(u_char),
                     (xdrproc_t)xdr_u_char))
         return (FALSE);
-    if (!xdr_vector(xdrs, (char *)objp->usermode, MAX_LEN_USERMODE, sizeof(u_char),
-                    (xdrproc_t)xdr_u_char))
+    if (!xdr_u_int(xdrs, &objp->usermode))
         return (FALSE);
     if (!xdr_u_int(xdrs, &objp->fun_index))
         return (FALSE);

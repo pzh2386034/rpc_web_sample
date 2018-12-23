@@ -13,7 +13,7 @@
     if (NULL == a)        \
         return b;
 static guint32 rpc_verify_user_check(const RPCInput *argp, const RPCOutput *output);
-static guint32 rpc_user_identify(const guchar *usermode,
+static guint32 rpc_user_identify(const guint usermode,
                                  const int userid,
                                  const guchar *username,
                                  const guchar *userip);
@@ -116,7 +116,7 @@ static guint32 rpc_verify_user_check(const RPCInput *argp, const RPCOutput *outp
     return ulret;
 }
 
-static guint32 rpc_user_identify(const guchar *usermode,
+static guint32 rpc_user_identify(const guint usermode,
                                  const int userid,
                                  const guchar *username,
                                  const guchar *userip)

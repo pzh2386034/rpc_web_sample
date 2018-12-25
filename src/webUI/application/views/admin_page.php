@@ -2,7 +2,7 @@
     <?php
     if (isset($this->session->userdata['logged_in'])) {
         $username = ($this->session->userdata['logged_in']['username']);
-        $email = ($this->session->userdata['logged_in']['email']);
+        $loginmethod = ($this->session->userdata['logged_in']['loginmethod']);
     } else {
         header("location: login");
     }
@@ -15,9 +15,8 @@
     <body>
         <div id="profile">
             <h2>Hello <b><i><?php echo $username ?></i></b> !</h2>
-            <h5>Welcome to Admin Page</h5>
+            <h5>Welcome to <?php echo $loginmethod ?> Page</h5>
             <h5>Your Username is <?php echo $username ?> </h5>
-            <h5>Your Email is <?php echo $email ?> </h5>
             <b><a href="logout">Logout</a></b>
         </div>
         <br/>

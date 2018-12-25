@@ -58,6 +58,10 @@ Class Login_Database extends CI_Model {
             }
         }
 
+        public function isDuplicate($email){
+            $this->db->get_where('user_login', array('email'=>$email), 1);
+            return $this->db->affected_rows()>0?TRUE:FALSE;
+        }
         }
 
 ?>

@@ -85,6 +85,7 @@ class User_Authentication extends CI_Controller
                         $session_data = array(
                             'username' => $result[0]->user_name,
                             'email' => $result[0]->user_email,
+                            'loginmethod' => "user",
                         );
                         // Add user data in session
                         $this->session->set_userdata('logged_in', $session_data);
@@ -99,12 +100,14 @@ class User_Authentication extends CI_Controller
             }
             else
             {
+                $username = $this->input->post('username');
+                $password = $this->input->post('password');
                 $retcode=cgi_admin_user_login($username, $password);
-                var_dump($retcode);
                 if ($retcode == 0)
                 {
                     $session_data = array(
                         'username' => $username,
+                        'loginmethod' => "admin",
                     );
                     $this->session->set_userdata('logged_in', $session_data);
                     $this->load->view('admin_page', $vars = array(), $return = FALSE);

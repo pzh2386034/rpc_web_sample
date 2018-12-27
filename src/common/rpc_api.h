@@ -81,7 +81,7 @@ extern "C"
     } ADMIN_USER_LOGIN_INP;
     typedef struct
     {
-        int userid;
+        uint funret;
     } ADMIN_USER_LOGIN_OUT;
 #define ACCOUNT_AUTH_ERR 0x52000001
 #define ACCOUNT_LOCK_ERR 0x52000002

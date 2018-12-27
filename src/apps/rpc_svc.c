@@ -17,6 +17,7 @@
 #include <sys/ttycom.h>
 #include <syslog.h>
 #include <unistd.h>
+#include "../common/commonFun.h"
 #include "errno.h"
 #include "rpc/rpc.h"
 #include "threadMonitor.h"
@@ -177,7 +178,7 @@ SVCXPRT *transp;
     /* 每一次rpc调用前发送心跳，传入本次rpc调用的参数， 并通知开始检测rpc server 线程
      * date:<2018-10-08>*/
     thread_monitor_heart_beat(g_rpc_hb_handle, ENABLE, &argument);
-    printf("%s, begin to ask rpc.funidx:%d\n", __func__, argument.all_api_in_one_1_arg.fun_index);
+    timelog("%s, begin to ask rpc.funidx:%d\n", __func__, argument.all_api_in_one_1_arg.fun_index);
     result = (*local)(&argument, rqstp);
     /* rpc返回后，停止检测rpc server线程 date:<2018-10-08>*/
     thread_monitor_heart_beat(g_rpc_hb_handle, UNABLE, NULL);

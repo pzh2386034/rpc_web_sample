@@ -58,6 +58,7 @@ class User_Authentication extends CI_Controller
         }
     }
 
+    //
     public function user_login_process()
     {
         $this->form_validation->set_rules('username', 'Username', 'trim|required|xss_clean');
@@ -65,8 +66,10 @@ class User_Authentication extends CI_Controller
 
         if ($this->form_validation->run() == FALSE) {
             if(isset($this->session->userdata['logged_in'])){
+                //如果已经登入，则跳转至admin_page页面
                 $this->load->view('admin_page');
             }else{
+                //否则，跳转至登入界面，可以选择登入方式
                 $this->load->view('admin_login_form');
             }
         } else {
@@ -114,8 +117,10 @@ class User_Authentication extends CI_Controller
                 }
                 else
                 {
-                    var_dump('Login as admin failed');
-                    exit();
+                    $data = array(
+                        'error_message' =>'Invalid Username or Password',
+                    );
+                    $this->load->view('admin_login_form', $data, $return = FALSE);
                 }
             }
         }

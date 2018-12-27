@@ -100,6 +100,7 @@ int admin_user_login(char *username, const char *passwd, const char *userip)
     if (ulret != SUCCESS)
     {
         timelog("[%s] LOGIN FAILED.", __func__);
+        return VOS_ERR;
     }
     memset_s(&output, sizeof(output), 0, sizeof(output));
 

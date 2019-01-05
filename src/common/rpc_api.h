@@ -21,6 +21,27 @@ extern "C"
     const guchar *user_name, const guchar *user_ip, const guint usermode, const guchar *input, \
         size_t inputlen, const guchar *output, size_t outputlen, guint32 func_id
 
+    //判断rpc调用参数合法性宏
+#define ASSERT_RPC_PARAMETER_VALID(inputtype, outputtype, rpcid)                   \
+    RPCCALL_PARAMETER_CHECKNULL(username, userIP, usermode, input, output, rpcid); \
+    RPCCALL_PARAMETER_CHECKLEN(inputLen, sizeof(inputtype), outputlen, sizeof(outputtype), rpcid);
+
+#define RPCCALL_PARAMETER_CHECKNULL(username, userIP, usermode, input, output, rpcid)      \
+    {                                                                                      \
+        if ((NULL == username) || (NULL == userip) || (NULL == input) || (NULL == output)) \
+        {                                                                                  \
+            timelog("invalid para of API %lu", rpcid);                                     \
+            return VOS_ERR;                                                                \
+        }                                                                                  \
+    }
+#define RPCCALL_PARAMETER_CHECKLEN(inputlen, correctinputlen, outputlen, correctoutputlen, rpcid) \
+    {                                                                                             \
+        if ((inputlen != correctinputlen) || (outputlen != correctoutputlen))                     \
+        {                                                                                         \
+            timelog("invalid para len of API %lu", rpcid);                                        \
+            return VOS_ERR;                                                                       \
+        }                                                                                         \
+    }
 #ifndef MEM_FREE
 #define MEM_FREE(p)   \
     do                \

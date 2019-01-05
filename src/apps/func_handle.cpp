@@ -22,18 +22,20 @@ int pam2login_conversation(int n,
     size_t loginmsglen   = 0;
 
     *resp = NULL;
+    timelog("[%s]", __func__);
     if (NULL == data)
     {
-        printf("pam conversation data is NULL.\n");
+        timelog("[%s] pam conversation data is NULL.\n", __func__);
         return (PAM_CONV_ERR);
     }
     authmsg = (AUTH_MSG_ST *)data;
     if (n <= 0 || n > PAM_MAX_NUM_MSG)
     {
-        printf("[%s] pam conversation n is too big(%d).\n", __func__, n);
+        timelog("[%s] pam conversation n is too big(%d).\n", __func__, n);
     }
     if ((reply = (pam_response *)malloc(n * sizeof(*reply))) == NULL)
     {
+        timelog("[%s] malloc failed.", __func__);
         return (PAM_CONV_ERR);
     }
     memset_s(reply, n * sizeof(*reply), 0, n * sizeof(struct pam_response));
@@ -45,7 +47,7 @@ int pam2login_conversation(int n,
         switch (msg[i]->msg_style)
         {
             case PAM_PROMPT_ECHO_ON:
-                printf("In PAM_PROMPT_ECHO_ON.\n");
+                timelog("[%s] In PAM_PROMPT_ECHO_ON.\n", __func__);
                 reply[i].resp = strdup(authmsg->username);
                 if (NULL == reply[i].resp)
                 {
@@ -53,7 +55,7 @@ int pam2login_conversation(int n,
                 }
                 break;
             case PAM_PROMPT_ECHO_OFF:
-                printf("In PAM_PROMPT_ECHO_OFF.\n");
+                timelog("[%s] In PAM_PROMPT_ECHO_ON.\n", __func__);
                 reply[i].resp = strdup(authmsg->passwd);
                 if (NULL == reply[i].resp)
                 {
@@ -62,7 +64,7 @@ int pam2login_conversation(int n,
                 break;
             case PAM_ERROR_MSG:
             case PAM_TEXT_INFO:
-                printf("In PAM MESG\n");
+                timelog("[%s] In PAM_PROMPT_ECHO_ON.\n", __func__);
                 loginmsglen = strlen(msg[i]->msg) + 1;
                 loginmsg    = (char *)malloc(loginmsglen);
                 if (NULL != loginmsg)
@@ -102,12 +104,12 @@ guint32 admin_login(ADMIN_USER_LOGIN_INP *authdata)
     gchar servicename[128] = {0};
     pam_handle_t *pamh     = NULL;
     struct pam_conv conversation;
-    gint32 pamret;
+    gint32 pamret = 0;
     AUTH_MSG_ST authmsg;
 
     if (NULL == authdata)
     {
-        printf("null point\n");
+        timelog("null point\n");
         return RPC_INPUT_PARAMETER_ERR;
     }
     if (WEBUI_AUTH == authdata->authtype)
@@ -120,7 +122,7 @@ guint32 admin_login(ADMIN_USER_LOGIN_INP *authdata)
     }
     else
     {
-        printf("unsupported auth type(%ul)\n", authdata->authtype);
+        timelog("unsupported auth type(% ul)\n ", authdata->authtype);
         return RPC_INPUT_PARAMETER_ERR;
     }
     /* conv为一个对话函数，实现应用程序与pam module之间的信息交互 date:<2018-11-24>*/

@@ -41,7 +41,6 @@ static void rpc_thread_monitor_timeout_sigle(int signo)
 }
 int main()
 {
-    g_printf("%s, main in\n", __func__);
     /* 注册SIGSEGV信号处理函数 date:<2018-10-07>*/
     signal(SIGSEGV, rpc_thread_monitor_timeout_sigle);
     GThread *gthread = NULL;

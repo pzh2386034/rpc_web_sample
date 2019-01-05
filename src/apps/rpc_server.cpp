@@ -4,6 +4,7 @@
  * as a guideline for developing your own functions.
  */
 
+#include "../common/commonFun.h"
 #include "../common/rpc.h"
 #include "rpc_resource.hpp"
 #include "rpc_resource_manager.hpp"
@@ -20,7 +21,7 @@ static guint32 rpc_user_identify(const guint usermode,
 RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
 {
     static RPCOutput output_para;
-    printf("%s, at server.\n", __func__);
+    timelog("%s, at server.\n", __func__);
     /* printf("%s: arrive at rpc server\n", __FUNCTION__); */
     /* sleep(3 * 60); */
     /* printf("%s: arrive at rpc server after 3 min\n", __FUNCTION__); */
@@ -30,25 +31,25 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
     guchar err               = 0xff;
     if (NULL == argp)
     {
-        printf("%s, input para null point\n", __func__);
+        timelog("%s, input para null point\n", __func__);
         goto FAILED_RET;
     }
     if ((strnlen((gchar *)argp->username, sizeof(argp->username)) >= sizeof(argp->username)) ||
         (strnlen((gchar *)argp->userIP, sizeof(argp->userIP)) >= sizeof(argp->userIP)))
     {
-        printf("%s,  invalid para.\n", __func__);
+        timelog("%s,  invalid para.\n", __func__);
         goto FAILED_RET;
     }
     if (0 != argp->out_para_len)
     {
         if (argp->out_para_len > MAX_SIZE_RPC_MEM)
         {
-            printf("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
+            timelog("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
             goto FAILED_RET;
         }
         if (NULL == (pszout = (guchar *)malloc(argp->out_para_len)))
         {
-            printf("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
+            timelog("%s, malloc large(0x%x).\n", __func__, argp->out_para_len);
             goto FAILED_RET;
         }
         memset(pszout, 0, (guint)argp->out_para_len);
@@ -57,7 +58,7 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
     output_para.output_para.output_para_val = pszout;
     if (VOS_ERR == rpc_verify_user_check(argp, &output_para))
     {
-        printf("%s, check user ok\n", __func__);
+        timelog("%s, check user ok\n", __func__);
         if ((NULL != pszout) && sizeof(gchar) == output_para.output_para.output_para_len)
         {
             free(pszout);
@@ -78,7 +79,7 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
                             pszout, argp->out_para_len);
         if (ulret != 0)
         {
-            printf("%s, APIfunc failed fundex:%d ret:0x%x.\n", __func__, argp->fun_index, ulret);
+            timelog("%s, APIfunc failed fundex:%d ret:0x%x.\n", __func__, argp->fun_index, ulret);
             goto FAILED_RET;
         }
         output_para.output_para.output_para_len = argp->out_para_len;
@@ -87,7 +88,7 @@ RPCOutput *all_api_in_one_1_svc(RPCInput *argp, struct svc_req *rqstp)
     }
     else
     {
-        printf("%s, APIfunc not exit fundex:%d\n", __func__, argp->fun_index);
+        timelog("%s, APIfunc not exit fundex:%d\n", __func__, argp->fun_index);
         goto FAILED_RET;
     }
 FAILED_RET:

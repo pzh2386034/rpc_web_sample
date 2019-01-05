@@ -99,7 +99,11 @@ PHP_FUNCTION(cgi_admin_user_login)
     result = admin_user_login(user, pwd, "127.0.0.1");
     if (result != SUCCESS)
     {
-        printf("[%s] admin_user_login failed.\n", __func__);
+        timelog("[%s] admin_user_login failed.\n", __func__);
+    }
+    else
+    {
+        timelog("[%s] user login successfully", __func__);
     }
     RETURN_LONG(result);
 }

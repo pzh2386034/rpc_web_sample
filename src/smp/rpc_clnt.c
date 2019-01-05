@@ -22,7 +22,7 @@ RPCOutput *all_api_in_one_1(RPCInput *argp, CLIENT *clnt)
                     &clnt_res, TIMEOUT);
     if (ret != RPC_SUCCESS)
     {
-        timelog("[%s] clnt_call failed.\n", __func__);
+        timelog("[%s] clnt_call failed, ret:%d\n", __func__, ret);
         return (NULL);
     }
     return (&clnt_res);

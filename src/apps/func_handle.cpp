@@ -1,4 +1,5 @@
 #include "func_handle.h"
+#include "../common/commonFun.h"
 #include "../common/rpc_api.h"
 #include "security/pam_appl.h"
 
@@ -133,15 +134,24 @@ guint32 admin_login(ADMIN_USER_LOGIN_INP *authdata)
     authmsg.errormsg         = NULL;
     authmsg.errorlen         = 0;
     conversation.appdata_ptr = &(authmsg);
-
-    if (PAM_SUCCESS != pam_start(servicename, authdata->username, &conversation, &pamh))
+    timelog("authmsg.username:%s, userpasswd:%s, ip:%s", authmsg.username, authmsg.passwd,
+            authdata->userIP);
+    /* 调用login的PAM配置文件，
+       @ pam_handle_t
+ pamh是保存所有pam信息的地方.由pam_start函数创建.这些信息,可以通过pam_set_item与pam_get_item来设置与获取.
+ date:<2018-12-31>*/
+    pamret = pam_start("login", authdata->username, &conversation, &pamh);
+    if (PAM_SUCCESS != pamret)
     {
+        timelog("login: PAM Failure, aborting: %s\n", pam_strerror(pamh, pamret));
         goto FAILED;
     }
+    /* 设置pam远程主机信息 date:<2018-12-31>*/
     if (PAM_SUCCESS != pam_set_item(pamh, PAM_RHOST, authdata->userIP))
     {
         goto FAILED;
     }
+    /*  设置pamh中用户名 date:<2018-12-31>*/
     if (PAM_SUCCESS != pam_set_item(pamh, PAM_USER, authdata->username))
     {
         goto FAILED;
@@ -153,13 +163,15 @@ guint32 admin_login(ADMIN_USER_LOGIN_INP *authdata)
         if (NULL != authmsg.errormsg)
             if (NULL != strstr(authmsg.errormsg, "Account locked"))
             {
-                printf("PAM auth failed msg: %s.", authmsg.errormsg);
+                timelog("[%s] PAM auth failed msg: %s.", __func__, authmsg.errormsg);
                 (void)memset_s(authmsg.errormsg, authmsg.errorlen, 0, authmsg.errorlen);
                 free(authmsg.errormsg);
                 (void)memset_s(&authmsg, sizeof(authmsg), 0, sizeof(authmsg));
                 (void)pam_end(pamh, 0);
                 return ACCOUNT_LOCK_ERR;
             }
+        timelog("[%s] PAM auth failed msg: %s, pamret:%d. %s", __func__, authmsg.errormsg, pamret,
+                pam_strerror(pamh, pamret));
         (void)memset_s(&authmsg, sizeof(authmsg), 0, sizeof(authmsg));
         (void)pam_end(pamh, 0);
         return ACCOUNT_AUTH_ERR;
@@ -178,7 +190,7 @@ guint32 admin_login(ADMIN_USER_LOGIN_INP *authdata)
     (void)pam_end(pamh, 0);
     return VOS_OK;
 FAILED:
-    printf("[%s]pam: set item failed\n", __func__);
+    timelog("[%s]pam: set item failed\n", __func__);
     if (NULL != authmsg.errormsg)
     {
         (void)memset_s(authmsg.errormsg, authmsg.errorlen, 0, authmsg.errorlen);
@@ -197,7 +209,7 @@ void SetWebLoginSuccessLog(ADMIN_USER_LOGIN_INP *authdata)
     {
         return;
     }
-    printf("[%s] login in from web success.\n", __func__);
+    timelog("[%s] login in from web success.\n", __func__);
     return;
 }
 void SetWebLoginFailLog(ADMIN_USER_LOGIN_INP *authdata)
@@ -208,6 +220,6 @@ void SetWebLoginFailLog(ADMIN_USER_LOGIN_INP *authdata)
     {
         return;
     }
-    printf("[%s] login in from web success.\n", __func__);
+    timelog("[%s] login in from web failed.\n", __func__);
     return;
 }

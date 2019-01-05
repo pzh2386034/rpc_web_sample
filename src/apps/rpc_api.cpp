@@ -1,9 +1,10 @@
 #include "../common/rpc_api.h"
 #include "../common/commonFun.h"
 #include "func_handle.h"
+#include "memory.h"
 #include "rpc_resource.hpp"
+#include "rpc_resource_manager.hpp"
 #include "security/pam_appl.h"
-
 guint32 rpccall_api_get_systime(PARALIST_RPC_CALL)
 {
 
@@ -23,23 +24,6 @@ guint32 rpccall_api_admin_login(PARALIST_RPC_CALL)
     ADMIN_USER_LOGIN_INP authin;
     ADMIN_USER_LOGIN_OUT *pauthout = NULL;
     char oplog[512]                = {0};
-    printf("begin to check para.\n");
-    if (NULL == username)
-    {
-        printf("username null.\n");
-    }
-    if (NULL == userip)
-    {
-        printf("username null.\n");
-    }
-    if (NULL == input)
-    {
-        printf("input null.\n");
-    }
-    if (NULL == output)
-    {
-        printf("output null.\n");
-    }
     ASSERT_RPC_PARAMETER_VALID(ADMIN_USER_LOGIN_INP, ADMIN_USER_LOGIN_OUT, ADMIN_USER_LOGIN);
     (void)memset_s(&authin, sizeof(ADMIN_USER_LOGIN_INP), 0, sizeof(ADMIN_USER_LOGIN_INP));
     (void)memset_s(pauthout, sizeof(ADMIN_USER_LOGIN_OUT), 0, sizeof(ADMIN_USER_LOGIN_OUT));
